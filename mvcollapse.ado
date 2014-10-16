@@ -10,10 +10,6 @@
  *
  * Don't expect too much, mvcollapse only checks (mean) and (rawsum) so far.
  *
- * @author Max Löffler <loeffler@zew.de>
- * @param `clist' Collapse is "(stat) varlist (stat) varlist ..."
- * @param `by'    Groups over which stat is to be calculated
- * 
  * 2014-10-05   Initial version (v0.1)
  * 2014-10-16   Added Stata version and tagged `exp'
  * 
@@ -35,9 +31,13 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-version 13
 
+/**
+ * @param `clist' Collapse is "(stat) varlist (stat) varlist ..."
+ * @param `by'    Groups over which stat is to be calculated
+ */
 program define mvcollapse
+    version 13
     syntax anything(name=clist id=clist) [aw/], by(varlist)
     
     // Fetch (rawsum) variables to deal with
