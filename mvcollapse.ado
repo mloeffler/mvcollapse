@@ -1,4 +1,4 @@
-*! version 0.1, 05oct2014, Max Löffler <loeffler@zew.de>
+*! version 0.1, 16oct2014, Max Löffler <loeffler@zew.de>
 /**
  * MVCOLLAPSE - SIMPLE WRAPPER FOR STATA'S COLLAPSE COMMAND, PRESERVES MISSINGS
  * 
@@ -13,8 +13,9 @@
  * @author Max Löffler <loeffler@zew.de>
  * @param `clist' Collapse is "(stat) varlist (stat) varlist ..."
  * @param `by'    Groups over which stat is to be calculated
-  * 
+ * 
  * 2014-10-05   Initial version (v0.1)
+ * 2014-10-16   Added Stata version and tagged `exp'
  * 
  *
  * Copyright (C) 2014 Max Löffler <loeffler@zew.de>
@@ -33,6 +34,8 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+
+version 13
 
 program define mvcollapse
     syntax anything(name=clist id=clist) [aw/], by(varlist)
