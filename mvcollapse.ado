@@ -1,4 +1,4 @@
-*! version 0.1, 16oct2014, Max Löffler <loeffler@zew.de>
+*! version 0.2, 27oct2014, Max Löffler <loeffler@zew.de>
 /**
  * MVCOLLAPSE - SIMPLE WRAPPER FOR STATA'S COLLAPSE COMMAND, PRESERVES MISSINGS
  * 
@@ -12,6 +12,7 @@
  *
  * 2014-10-05   Initial version (v0.1)
  * 2014-10-16   Added Stata version and tagged `exp'
+ * 2014-10-27   Add option to preserve variable labels (v0.2)
  * 
  *
  * Copyright (C) 2014 Max Löffler <loeffler@zew.de>
@@ -35,10 +36,11 @@
 /**
  * @param `clist' Collapse is "(stat) varlist (stat) varlist ..."
  * @param `by'    Groups over which stat is to be calculated
+ * @param `label' Specify to preserve variable labels
  */
 program define mvcollapse
     version 13
-    syntax anything(name=clist id=clist) [aw/], by(varlist)
+    syntax anything(name=clist id=clist) [aw/], by(varlist) [Label]
     
     // Fetch (rawsum) variables to deal with
     if (regexm("`clist'", "\(rawsum\) ([a-zA-Z0-9_ \-\*\?]*)")) {
@@ -64,8 +66,22 @@ program define mvcollapse
         }
     }
     
+    // Preserve labels
+    if ("`label'" != "") {
+        foreach var of var * {
+            cap local lb`var' : var label `var'
+        }
+    }
+    
     // Run true collapse
     collapse `clist' (mean) `countlist', by(`by')
+    
+    // Restore labels
+    if ("`label'" != "") {
+        foreach var of var * {
+            if ("`var'" != "") label var `var' "`lb`var''"
+        }
+    }
     
     // Restore missings
     if ("`lrsum'`lmean'" != "") {

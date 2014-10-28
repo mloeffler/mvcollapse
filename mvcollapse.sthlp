@@ -18,7 +18,7 @@ missings
 {p 8 17 2}
 {cmd:mvcollapse}
 {it:clist} {weight}
-, {cmd:by}({varlist})
+, {cmd:by}({varlist}) [{cmdab:l:abel}]
 
 
 {marker description}{...}
@@ -42,6 +42,9 @@ Don't expect too much, {opt mvcollapse} only checks (mean) and (rawsum) so far.
 
 {pstd}
 See options of Stata's {bf:{help collapse}} command.
+
+{pstd}
+{cmd:label} at least tries to preserve variable labels.
 
 
 {marker author}{...}
