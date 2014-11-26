@@ -1,4 +1,4 @@
-*! version 0.2, 27oct2014, Max Löffler <loeffler@zew.de>
+*! version 0.2, 27oct2014, Max Loeffler <loeffler@zew.de>
 /**
  * MVCOLLAPSE - SIMPLE WRAPPER FOR STATA'S COLLAPSE COMMAND, PRESERVES MISSINGS
  * 
