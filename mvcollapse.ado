@@ -1,4 +1,4 @@
-*! version 0.2, 27oct2014, Max Loeffler <loeffler@zew.de>
+*! version 0.21, 30apr2015, Max Loeffler <loeffler@zew.de>
 /**
  * MVCOLLAPSE - SIMPLE WRAPPER FOR STATA'S COLLAPSE COMMAND, PRESERVES MISSINGS
  * 
@@ -13,6 +13,7 @@
  * 2014-10-05   Initial version (v0.1)
  * 2014-10-16   Added Stata version and tagged `exp'
  * 2014-10-27   Add option to preserve variable labels (v0.2)
+ * 2015-04-30   Bugfix, use weights to collapse when specified
  * 
  *
  * Copyright (C) 2014 Max Löffler <loeffler@zew.de>
@@ -40,7 +41,10 @@
  */
 program define mvcollapse
     version 13
-    syntax anything(name=clist id=clist) [aw/], by(varlist) [Label]
+    syntax anything(name=clist id=clist) [aw], by(varlist) [Label]
+
+    // Fetch weight option
+    local weight = cond("`weight'`exp'" != "", "[`weight'`exp']", "")
     
     // Fetch (rawsum) variables to deal with
     if (regexm("`clist'", "\(rawsum\) ([a-zA-Z0-9_ \-\*\?]*)")) {
@@ -74,7 +78,7 @@ program define mvcollapse
     }
     
     // Run true collapse
-    collapse `clist' (mean) `countlist', by(`by')
+    collapse `clist' (mean) `countlist' `weight', by(`by')
     
     // Restore labels
     if ("`label'" != "") {
