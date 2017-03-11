@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.1, 05oct2014}{...}
+{* *! version 0.22, 11mar2017}{...}
 {vieweralsosee "[R] collapse" "help collapse"}{...}
 {viewerjumpto "Syntax" "mvcollapse##syntax"}{...}
 {viewerjumpto "Description" "mvcollapse##description"}{...}
@@ -44,7 +44,7 @@ Don't expect too much, {opt mvcollapse} only checks (mean) and (rawsum) so far.
 See options of Stata's {bf:{help collapse}} command.
 
 {pstd}
-{cmd:label} at least tries to preserve variable labels.
+{cmd:label} tries to preserve variable labels.
 
 
 {marker author}{...}
@@ -60,7 +60,7 @@ suggestions are welcome.
 {title:License}
 
 {pstd}
-Copyright (C) 2014, {browse "mailto:loeffler@zew.de":Max Löffler}
+Copyright (C) 2014-2017, {browse "mailto:loeffler@zew.de":Max Löffler}
 
 {pstd}
 This program is free software; you can redistribute it and/or modify

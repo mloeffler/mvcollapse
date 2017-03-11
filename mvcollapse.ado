@@ -1,4 +1,4 @@
-*! version 0.21, 30apr2015, Max Loeffler <loeffler@zew.de>
+*! version 0.22, 11mar2017, Max Loeffler <loeffler@zew.de>
 /**
  * MVCOLLAPSE - SIMPLE WRAPPER FOR STATA'S COLLAPSE COMMAND, PRESERVES MISSINGS
  * 
@@ -14,9 +14,10 @@
  * 2014-10-16   Added Stata version and tagged `exp'
  * 2014-10-27   Add option to preserve variable labels (v0.2)
  * 2015-04-30   Bugfix, use weights to collapse when specified
+ * 2017-03-11   Use tempvar to create missing indicators
  * 
  *
- * Copyright (C) 2014 Max Löffler <loeffler@zew.de>
+ * Copyright (C) 2014-2017 Max Löffler <loeffler@zew.de>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,8 +41,8 @@
  * @param `label' Specify to preserve variable labels
  */
 program define mvcollapse
-    version 13
-    syntax anything(name=clist id=clist) [aw], by(varlist) [Label]
+    version 13.0
+    syntax anything(name=clist id=clist equalok) [aw], by(varlist) [Label FAST]
 
     // Fetch weight option
     local weight = cond("`weight'`exp'" != "", "[`weight'`exp']", "")
@@ -57,20 +58,23 @@ program define mvcollapse
         local lmean `r(varlist)'
     }
     
+    // If anything to do, create tempvars for N and non-missing N in by-group
     if ("`lrsum'`lmean'" != "") {
+        // Remember N indicators for collapse command later on
         local countlist
         
         // Loop over variables and add counters
         foreach var in `lrsum' `lmean' {
-            if (strpos(" `countlist' ", " nm_`var'_nm ") == 0) {
-                bys `by':  gen nn_`var'_nn = _N
-                bys `by': egen nm_`var'_nm = count(`var')
-                local countlist `countlist' nn_`var'_nn nm_`var'_nm
+            if ("`tmp_n_`var''" == "" & "`tmp_nm_`var''" == "") {
+                tempvar tmp_n_`var' tmp_nm_`var'
+                bys `by':  gen `tmp_n_`var''  = _N
+                bys `by': egen `tmp_nm_`var'' = count(`var')
+                local countlist `countlist' `tmp_n_`var'' `tmp_nm_`var''
             }
         }
     }
     
-    // Preserve labels
+    // Preserve labels if option specified
     if ("`label'" != "") {
         foreach var of var * {
             cap local lb`var' : var label `var'
@@ -78,24 +82,24 @@ program define mvcollapse
     }
     
     // Run true collapse
-    collapse `clist' (mean) `countlist' `weight', by(`by')
+    collapse `clist' (mean) `countlist' `weight', by(`by') `fast'
     
-    // Restore labels
+    // Restore labels if option specified
     if ("`label'" != "") {
         foreach var of var * {
-            if ("`var'" != "") label var `var' "`lb`var''"
+            cap label var `var' "`lb`var''"
         }
     }
     
     // Restore missings
     if ("`lrsum'`lmean'" != "") {
-        // One missing in (rawsum)? All to missings.
+        // One missing in (rawsum) by-group? Set whole by-group to missings.
         foreach var in `lrsum' {
-            replace `var' = . if nn_`var'_nn > nm_`var'_nm
+            qui replace `var' = . if `tmp_n_`var'' > `tmp_nm_`var''
         }
-        // One non-missing in (mean)? That's alright.
+        // Only missing obervations in (mean) by-group? Replace mean by missing.
         foreach var in `lmean' {
-            replace `var' = . if nm_`var'_nm == 0
+            qui replace `var' = . if `tmp_nm_`var'' == 0
         }
         // Clean up
         cap drop `countlist'
