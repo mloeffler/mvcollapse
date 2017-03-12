@@ -1,4 +1,4 @@
-*! version 0.22, 11mar2017, Max Loeffler <loeffler@zew.de>
+*! version 0.23, 12mar2017, Max Loeffler <loeffler@zew.de>
 /**
  * MVCOLLAPSE - SIMPLE WRAPPER FOR STATA'S COLLAPSE COMMAND, PRESERVES MISSINGS
  * 
@@ -15,6 +15,7 @@
  * 2014-10-27   Add option to preserve variable labels (v0.2)
  * 2015-04-30   Bugfix, use weights to collapse when specified
  * 2017-03-11   Use tempvar to create missing indicators
+ * 2017-03-12   Bugfix, understand basic varlists, use missing() function
  * 
  *
  * Copyright (C) 2014-2017 Max Löffler <loeffler@zew.de>
@@ -48,12 +49,12 @@ program define mvcollapse
     local weight = cond("`weight'`exp'" != "", "[`weight'`exp']", "")
     
     // Fetch (rawsum) variables to deal with
-    if (regexm("`clist'", "\(rawsum\) ([a-zA-Z0-9_ \-\*\?]*)")) {
+    if (regexm("`clist'", "\(rawsum\) ([^\(]+)")) {
         qui ds `=regexs(1)'
         local lrsum `r(varlist)'
     }
     // Fetch (mean) variables to deal with
-    if (regexm("`clist'", "\(mean\) ([a-zA-Z0-9_ \-\*\?]*)")) {
+    if (regexm("`clist'", "\(mean\) ([^\(]+)")) {
         qui ds `=regexs(1)'
         local lmean `r(varlist)'
     }
@@ -68,7 +69,7 @@ program define mvcollapse
             if ("`tmp_n_`var''" == "" & "`tmp_nm_`var''" == "") {
                 tempvar tmp_n_`var' tmp_nm_`var'
                 bys `by':  gen `tmp_n_`var''  = _N
-                bys `by': egen `tmp_nm_`var'' = count(`var')
+                bys `by': egen `tmp_nm_`var'' = total(!missing(`var'))
                 local countlist `countlist' `tmp_n_`var'' `tmp_nm_`var''
             }
         }
@@ -82,6 +83,7 @@ program define mvcollapse
     }
     
     // Run true collapse
+    di as text "collapse `clist' `weight', by(`by') `fast'"
     collapse `clist' (mean) `countlist' `weight', by(`by') `fast'
     
     // Restore labels if option specified

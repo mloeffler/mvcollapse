@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.22, 11mar2017}{...}
+{* *! version 0.23, 12mar2017}{...}
 {vieweralsosee "[R] collapse" "help collapse"}{...}
 {viewerjumpto "Syntax" "mvcollapse##syntax"}{...}
 {viewerjumpto "Description" "mvcollapse##description"}{...}
@@ -25,16 +25,19 @@ missings
 {title:Description}
 
 {pstd}
-{opt mvcollapse} is a simple fork of Stata's built-in {bf:{help collapse}}
-command that preserves missing values. Stata treats missings values as zero and
-the sum as well as the mean over a group of missings evaluates to zero. This
-makes sense when thinking how Stata calculates these statistics, but it might
-be misleading in some applications. {opt mvcollapse} will set the sum over a
-group to missing if the group contains any missing value. The group mean with
-missing values is set to missing only if all values are missing.
+{opt mvcollapse} is a simple wrapper for Stata's built-in {bf:{help collapse}}
+command that preserves missing values. If you take the sum over a group with 
+missing values via {bf:{help collapse}}, Stata will evaluate to zero. If you
+mean collapse a group with only missing values, Stata will evaluate to zero as
+well. This makes sense when thinking how Stata calculates these statistics, but
+it might be misleading in some applications. {opt mvcollapse} will set the sum
+over a group to missing if the group contains any missing value. The group mean
+with missing values is set to missing only if all values are missing.
 
 {pstd}
 Don't expect too much, {opt mvcollapse} only checks (mean) and (rawsum) so far.
+Furthermore, you cannot use {bf:{help collapse}} (mean) foo = bar syntax, but
+only specify varlists by now.
 
 
 {marker options}{...}
