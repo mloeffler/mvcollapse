@@ -16,7 +16,7 @@ Done.
 
 ## Info
 
-Copyright (C) 2014, [Max Löffler](http://www.zew.de/en/staff/mlo)
+Copyright (C) 2014, [Max LÃ¶ffler](http://www.zew.de/en/staff/mlo)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
